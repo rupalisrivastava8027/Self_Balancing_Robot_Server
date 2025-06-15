@@ -1,11 +1,13 @@
 from flask import Flask, render_template, jsonify, request
 from Gyro import Gyro
 from MotorController import MotorController
+from PIDController import PIDController
 
 app = Flask(__name__)
 
 sensor = Gyro()
-motor = MotorController() 
+motor = MotorController()
+pidcontroller = PIDController()
 
 @app.route("/")
 def main():
@@ -13,9 +15,11 @@ def main():
 
 @app.route("/data")
 def data():
+    pitchAngle = sensor.getPitchAngle()
     return jsonify(
-        {"PitchAngle": sensor.getPitchAngle(),
-         "MotorSpeed": motor.getSpeed()
+        {"PitchAngle": pitchAngle,
+         "MotorSpeed": motor.getSpeed(),
+         "POutput": pidcontroller.getOutput(pitchAngle)
         })
 
 @app.route("/requests", methods=["POST"])
